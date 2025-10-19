@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Formulir Validasi</title>
+
+  <style>
+    /* === Typography & Layout === */
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background: linear-gradient(180deg, #f3f4f6 0%, #e5e7eb 100%);
+      display: flex; justify-content: center; align-items: center;
+      min-height: 100vh; margin: 0;
+    }
+    .card {
+      background: #fff;
+      border-radius: 1rem;
+      padding: 2rem 2.2rem;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+      max-width: 380px;
+      width: 100%;
+    }
+    h1 { text-align: center; color: #1f2937; font-size: 1.75rem; margin-bottom: .5rem; }
+    p  { text-align: center; color: #4b5563; margin-bottom: 1.5rem; }
+
+    /* === Form Elements === */
+    label { display: block; margin-bottom: 1rem; color: #374151; font-weight: 500; }
+    input {
+      width: 100%;
+      padding: .55rem .9rem;
+      border: 1px solid #d1d5db;
+      border-radius: .5rem;
+      font-size: .95rem;
+      transition: all .3s ease;
+      box-sizing: border-box;
+    }
+    input:focus {
+      outline: none;
+      border-color: #93c5fd;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+    .input-error {
+      border-color: #ef4444 !important;
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+    }
+    .input-ok {
+      border-color: #10b981 !important;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+    }
+    .error-text {
+      color: #ef4444;
+      font-size: .85rem;
+      margin-top: .3rem;
+      display: none;
+    }
+
+    /* === Button === */
+    .btn {
+      display: inline-block;
+      width: 100%;
+      padding: .85rem 2rem;
+      background: #10b981;
+      color: #fff;
+      font-weight: 700;
+      font-size: 1rem;
+      border: none;
+      border-radius: .75rem;
+      cursor: pointer;
+      transition: transform .2s ease, box-shadow .2s ease;
+      box-shadow: 0 12px 30px rgba(16,185,129,.25);
+    }
+    .btn:hover { transform: translateY(-1px) scale(1.02); }
+    .btn:active { transform: translateY(0) scale(.99); }
+
+    /* === Toggle Password === */
+    .relative { position: relative; }
+    .toggle {
+      position: absolute;
+      top: 50%;
+      right: .75rem;
+      transform: translateY(-50%);
+      border: none;
+      background: none;
+      font-size: 1.1rem;
+      color: #6b7280;
+      cursor: pointer;
+      padding: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <h1>Formulir Validasi</h1>
+    <p>Silakan isi data dengan benar sebelum dikirim.</p>
+
+    <form id="formulir" novalidate>
+      <!-- Nama -->
+      <label for="nama">
+        Nama
+        <input type="text" id="nama" placeholder="Masukkan nama">
+        <small id="nama-error" class="error-text">Nama wajib diisi.</small>
+      </label>
+
+      <!-- Email -->
+      <label for="email">
+        Email
+        <input type="email" id="email" placeholder="nama@domain.com">
+        <small id="email-error" class="error-text">Masukkan email yang valid (contoh: nama@domain.com).</small>
+      </label>
+
+      <!-- Password -->
+      <label for="password">
+        Password
+        <div class="relative">
+          <input type="password" id="password" placeholder="Minimal 8 karakter">
+          <button type="button" id="togglePass" class="toggle" aria-label="Lihat sandi">👁️</button>
+        </div>
+        <small id="password-error" class="error-text">Password minimal 8 karakter.</small>
+      </label>
+
+      <button type="submit" class="btn">Kirim</button>
+    </form>
+  </div>
+
+  <script>
+    const form = document.getElementById('formulir');
+    const nama = document.getElementById('nama');
+    const email = document.getElementById('email');
+    const password = document.getElementById('password');
+    const errNama = document.getElementById('nama-error');
+    const errEmail = document.getElementById('email-error');
+    const errPass = document.getElementById('password-error');
+    const toggleBtn = document.getElementById('togglePass');
+    const polaEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    // Toggle password visibility (mata buka/tutup)
+    let visible = false;
+    toggleBtn.addEventListener('click', () => {
+      visible = !visible;
+      password.type = visible ? 'text' : 'password';
+      toggleBtn.textContent = visible ? '🙈' : '👁️'; // mata terbuka / tertutup
+    });
+
+    // Fungsi bantu
+    const showErr = (el, msgEl, msg) => {
+      el.classList.add('input-error');
+      msgEl.textContent = msg;
+      msgEl.style.display = 'block';
+    };
+    const clearErr = (el, msgEl) => {
+      el.classList.remove('input-error');
+      msgEl.style.display = 'none';
+      el.classList.add('input-ok');
+    };
+
+    // Validasi
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      let valid = true;
+
+      if (nama.value.trim() === '') {
+        showErr(nama, errNama, 'Nama wajib diisi.');
+        valid = false;
+      } else clearErr(nama, errNama);
+
+      if (!polaEmail.test(email.value.trim())) {
+        showErr(email, errEmail, 'Masukkan email yang valid (contoh: nama@domain.com).');
+        valid = false;
+      } else clearErr(email, errEmail);
+
+      if (password.value.length < 8) {
+        showErr(password, errPass, 'Password minimal 8 karakter.');
+        valid = false;
+      } else clearErr(password, errPass);
+
+      if (valid) {
+        alert(`Data berhasil dikirim!\nNama: ${nama.value}\nEmail: ${email.value}`);
+        form.reset();
+        [nama, email, password].forEach(i => i.classList.remove('input-ok'));
+      }
+    });
+  </script>
+</body>
+</html>
